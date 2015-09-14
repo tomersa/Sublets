@@ -1,6 +1,8 @@
 import urllib2
 import simplecrypt
-import sys
+import sys, os
+
+DEBUG = True
 
 class FacebookHandler:
     ENTER_PASSWORD_MESSAGE = "Enter password:"
@@ -27,12 +29,37 @@ class FacebookHandler:
 
         access_token = urllib2.urlopen(graph_api_request).read().replace("access_token=", "")
 
+        write_access_token_to_file(access_token)
+
         return access_token
+
+
+def read_access_token_from_file():
+    try:
+        handle = open(".access_token", "r")
+        access_token = handle.read()
+
+    finally:
+        handle.close()
+
+    return access_token
+
+def write_access_token_to_file(access_token):
+    try:
+        handle = open(".access_token", "w")
+        handle.write(access_token)
+
+    finally:
+        handle.close()
 
 def main():
     facebook_handler = FacebookHandler(sys.argv[1])
-    print facebook_handler.read_from_api()
 
+    if DEBUG and os.path.exists(".access_token"):
+        access_token = read_access_token_from_file()
+
+    else:
+        print facebook_handler.read_from_api()
 
 if __name__ == "__main__":
     main()
