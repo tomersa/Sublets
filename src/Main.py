@@ -1,26 +1,37 @@
+import urllib2
 import simplecrypt
 import sys
-import eatiht.v2 as v2
 
-def readContent(input_file_path):
-    content = None
+class FacebookHandler:
+    ENTER_PASSWORD_MESSAGE = "Enter password:"
 
-    try:
-        handle = open(input_file_path)
-        content = handle.read()
+    def __init__(self, key_path):
+        self.ENCRYPTED_KEY_PATH = key_path
 
-    finally:
-        handle.close()
+    def __read_encrypted_client_secret(self):
+        handle = open(self.ENCRYPTED_KEY_PATH, "r")
+        key_content = None
+        try:
+            key_content = handle.read()
 
-    return content
+        finally:
+            handle.close()
 
+        decrypted_key = simplecrypt.decrypt(raw_input(FacebookHandler.ENTER_PASSWORD_MESSAGE), key_content)
+
+        return decrypted_key
+
+    def read_from_api(self):
+        encrypted_client_secret = self.__read_encrypted_client_secret()
+        graph_api_request = "https://graph.facebook.com/oauth/access_token?client_id=490769394355273&client_secret=%s&grant_type=client_credentials" % encrypted_client_secret
+
+        access_token = urllib2.urlopen(graph_api_request).read().replace("access_token=", "")
+
+        return access_token
 
 def main():
-    input_file_path = sys.argv[1]
-
-    content = readContent(input_file_path)
-
-    print v2.extract(content)
+    facebook_handler = FacebookHandler(sys.argv[1])
+    print facebook_handler.read_from_api()
 
 
 if __name__ == "__main__":
