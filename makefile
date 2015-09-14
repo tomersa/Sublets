@@ -1,4 +1,6 @@
-all: install_dependencies test
+all: test
+
+install: install_dependencies
 
 install_dependencies:
 	sudo ./install_dependencies.sh

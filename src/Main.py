@@ -57,7 +57,7 @@ def main():
 
     if DEBUG and os.path.exists(".access_token"):
         access_token = read_access_token_from_file()
-
+        print access_token
     else:
         print facebook_handler.read_from_api()
 
