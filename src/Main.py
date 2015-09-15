@@ -4,7 +4,7 @@ import sys, os
 
 DEBUG = True
 
-class FacebookHandler:
+class FacebookTokenHandler:
     ENTER_PASSWORD_MESSAGE = "Enter password:"
 
     def __init__(self, key_path):
@@ -19,7 +19,7 @@ class FacebookHandler:
         finally:
             handle.close()
 
-        decrypted_key = simplecrypt.decrypt(raw_input(FacebookHandler.ENTER_PASSWORD_MESSAGE), key_content)
+        decrypted_key = simplecrypt.decrypt(raw_input(FacebookTokenHandler.ENTER_PASSWORD_MESSAGE), key_content)
 
         return decrypted_key
 
@@ -52,14 +52,18 @@ def write_access_token_to_file(access_token):
     finally:
         handle.close()
 
-def main():
-    facebook_handler = FacebookHandler(sys.argv[1])
 
+def get_fb_token():
+    facebook_token_handler = FacebookTokenHandler(sys.argv[1])
     if DEBUG and os.path.exists(".access_token"):
         access_token = read_access_token_from_file()
         print access_token
     else:
-        print facebook_handler.read_from_api()
+        print facebook_token_handler.read_from_api()
+
+
+def main():
+    get_fb_token()
 
 if __name__ == "__main__":
     main()
