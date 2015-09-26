@@ -3,7 +3,8 @@ import sys
 import codecs
 
 from DataReceiver import DataReceiver
-from Entities import AnalyzedPost
+from PostAnalyzer import PostAnalyzer
+
 
 class Sublets:
     def __init__(self, group_feed_directory):
@@ -17,8 +18,7 @@ class Sublets:
             with codecs.open(os.path.join("output", post.id), "w", encoding='utf-8') as out:
                 out.write(post.message)
 
-            analyzed = AnalyzedPost(post)
-
+            analyzed = PostAnalyzer.create().analyze_post(post)
             print analyzed
 
 if __name__ == "__main__":
