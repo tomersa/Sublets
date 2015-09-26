@@ -1,3 +1,4 @@
+import types
 import pprint
 import codecs
 import json
@@ -14,12 +15,13 @@ class UnicodePrettyPrinter(pprint.PrettyPrinter):
 
 
 class DataReceiver:
-    ERROR_COULDNT_READ_MESSAGE = "couldn't process post"
-    ERROR_COULDNT_READ_JSON = "Couldn't read json"
+    ERROR_COULDNT_READ_MESSAGE = "Unprocessed posts"
+    ERROR_COULDNT_READ_JSON = "Non readable json file: {0}"
+    JSONS_READ = "JSONs read"
 
     def __init__(self, group_feed_directory):
         self.__post_queue = []
-        self.__errors = {DataReceiver.ERROR_COULDNT_READ_MESSAGE:0, DataReceiver.ERROR_COULDNT_READ_JSON:0}
+        self.__statistics = {DataReceiver.ERROR_COULDNT_READ_MESSAGE: 0, DataReceiver.ERROR_COULDNT_READ_JSON: [], DataReceiver.JSONS_READ: 0}
 
         self.read_feed(group_feed_directory)
 
@@ -40,19 +42,24 @@ class DataReceiver:
                 try:
                     data = json.load(gf_handle)
                 except StandardError, e:
-                    self.__errors[DataReceiver.ERROR_COULDNT_READ_JSON] += 1
-                    data = None
+                    self.__statistics[DataReceiver.ERROR_COULDNT_READ_JSON].append(DataReceiver.ERROR_COULDNT_READ_JSON.format(file))
                     continue
+
+                self.__statistics[DataReceiver.JSONS_READ] += 1
 
                 for post in data['data']:
                     try:
                         self.__post_queue.append(Post(post))
                     except StandardError:
-                        self.__errors[DataReceiver.ERROR_COULDNT_READ_MESSAGE] += 1
+                        self.__statistics[DataReceiver.ERROR_COULDNT_READ_MESSAGE] += 1
 
-        for error_message, times in self.__errors.items():
-            if times > 0:
-                print "{0} {1} times".format(error_message, times)
+        for stat_name, stat_value in self.__statistics.items():
+            if type(stat_value) is type([]) and len(stat_value) > 0:
+                for value in stat_value:
+                    print value
+
+            elif stat_value > 0:
+                print "{0}: {1}".format(stat_name, stat_value)
 
     def get_data(self):
         return self.__post_queue
