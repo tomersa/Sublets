@@ -1,28 +1,7 @@
 import sys
-import pprint
+import codecs
 
-from src.DataReceiver import DataReceiver
-
-
-DEBUG = True
-
-#
-class UnicodePrettyPrinter(pprint.PrettyPrinter):
-    def format(self, raw_object, context, max_levels, level):
-        if isinstance(raw_object, unicode):
-            return raw_object.encode('utf8'), True, False
-
-        return pprint.PrettyPrinter.format(self, raw_object, context, max_levels, level)
-
-
-#
-
-class Post:
-    def __init__(self, json_post):
-        self.id = json_post[u'id']
-        self.message = json_post[u'message']
-        self.updated_time = json_post[u'updated_time']
-
+from DataReceiver import DataReceiver
 
 class Sublets:
     def __init__(self, group_feed_directory):
@@ -30,7 +9,8 @@ class Sublets:
 
     def main(self):
         for post in self.__dr.get_data():
-            print post.message
+            with codecs.open(post.id, "w", encoding='utf-8') as out:
+                out.write(post.message)
 
 if __name__ == "__main__":
     group_feed_directory = sys.argv[1]
