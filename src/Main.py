@@ -1,3 +1,4 @@
+import os
 import sys
 import codecs
 
@@ -7,9 +8,11 @@ class Sublets:
     def __init__(self, group_feed_directory):
         self.__dr = DataReceiver(group_feed_directory)
 
+        os.makedirs("output")
+
     def main(self):
         for post in self.__dr.get_data():
-            with codecs.open(post.id, "w", encoding='utf-8') as out:
+            with codecs.open(os.path.join("output", post.id), "w", encoding='utf-8') as out:
                 out.write(post.message)
 
 if __name__ == "__main__":

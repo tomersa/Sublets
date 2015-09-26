@@ -1,4 +1,7 @@
-all: test
+all: clean test
+
+clean:
+	rm -rf output/
 
 install: install_dependencies
 
