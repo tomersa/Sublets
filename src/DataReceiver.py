@@ -6,6 +6,7 @@ import os
 
 from Entities import Post
 
+
 class UnicodePrettyPrinter(pprint.PrettyPrinter):
     def format(self, raw_object, context, max_levels, level):
         if isinstance(raw_object, unicode):
@@ -18,10 +19,12 @@ class DataReceiver:
     ERROR_COULDNT_READ_MESSAGE = "Unprocessed posts"
     ERROR_COULDNT_READ_JSON = "Non readable json file: {0}"
     JSONS_READ = "JSONs read"
+    POSTS_READ = "Posts read"
 
     def __init__(self, group_feed_directory):
         self.__post_queue = []
-        self.__statistics = {DataReceiver.ERROR_COULDNT_READ_MESSAGE: 0, DataReceiver.ERROR_COULDNT_READ_JSON: [], DataReceiver.JSONS_READ: 0}
+        self.__statistics = {DataReceiver.ERROR_COULDNT_READ_MESSAGE: 0, DataReceiver.ERROR_COULDNT_READ_JSON: [],
+                             DataReceiver.JSONS_READ: 0, DataReceiver.POSTS_READ: 0}
 
         self.read_feed(group_feed_directory)
 
@@ -42,7 +45,8 @@ class DataReceiver:
                 try:
                     data = json.load(gf_handle)
                 except StandardError, e:
-                    self.__statistics[DataReceiver.ERROR_COULDNT_READ_JSON].append(DataReceiver.ERROR_COULDNT_READ_JSON.format(file))
+                    self.__statistics[DataReceiver.ERROR_COULDNT_READ_JSON].append(
+                        DataReceiver.ERROR_COULDNT_READ_JSON.format(file))
                     continue
 
                 self.__statistics[DataReceiver.JSONS_READ] += 1
@@ -52,6 +56,8 @@ class DataReceiver:
                         self.__post_queue.append(Post(post))
                     except StandardError:
                         self.__statistics[DataReceiver.ERROR_COULDNT_READ_MESSAGE] += 1
+
+                    self.__statistics[DataReceiver.POSTS_READ] += 1
 
         for stat_name, stat_value in self.__statistics.items():
             if type(stat_value) is type([]) and len(stat_value) > 0:
