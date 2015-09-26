@@ -17,15 +17,15 @@ class UnicodePrettyPrinter(pprint.PrettyPrinter):
 
 #
 
-class Message:
-    def __init__(self, json_message):
-        self.id = json_message[u'id']
-        self.message = json_message[u'message']
-        self.updated_time = json_message[u'updated_time']
+class Post:
+    def __init__(self, json_post):
+        self.id = json_post[u'id']
+        self.message = json_post[u'message']
+        self.updated_time = json_post[u'updated_time']
 
 class DataReceiver:
     def __init__(self, group_feed_directory):
-        self.__message_queue = []
+        self.__post_queue = []
 
         self.read_feed(group_feed_directory)
 
@@ -44,14 +44,14 @@ class DataReceiver:
             with codecs.open(group_feed_file, "r", encoding="utf-8") as gf_handle:
                 data = json.load(gf_handle)
                 UnicodePrettyPrinter().pprint(data['data'][0])
-                for message in data['data']:
+                for post in data['data']:
                     try:
-                        self.__message_queue.append(Message(message))
+                        self.__post_queue.append(Post(post))
                     except Exception:
-                        print "couldn\'t process message"
+                        print "couldn\'t process post"
 
     def get_data(self):
-        return self.__message_queue
+        return self.__post_queue
 
 
 class Sublets:
@@ -59,8 +59,8 @@ class Sublets:
         self.__dr = DataReceiver(group_feed_directory)
 
     def main(self):
-        for message in self.__dr.get_data():
-            print message.message
+        for post in self.__dr.get_data():
+            print post.message
 
 if __name__ == "__main__":
     group_feed_directory = sys.argv[1]
