@@ -18,6 +18,9 @@ class PostAnalyzer:
     def __init__(self):
         self.__extractor = [self.get_street]
 
+        with codecs.open("res/tel_aviv_streets", "r", encoding='utf-8') as f:
+            self.__streets = f.read().splitlines()
+
     def analyze_post(self, post):
         analysis = {}
         for extractor in self.__extractor:
@@ -28,10 +31,26 @@ class PostAnalyzer:
     def get_numbers(self, message):
         return re.findall("\\d+", message)
 
+    #Assuming line starts with the street name
+    def __get_valid_street_name(self, line):
+        possible_streets = filter(line.startswith, self.__streets)
+
+        if len(possible_streets) is 0:
+            return None
+
+        longest = max(map(len, possible_streets))
+
+        for street in possible_streets:
+            if len(street) is longest:
+                return street
+
+        raise StandardError("Couldn't find longest street(That's logically impossible).")
+
+
     def get_street(self, message):
         match_object = re.search(u'רחוב (\W\W*?) ', message)
         if not match_object is None:
-            return match_object.groups(1)
+            return self.__get_valid_street_name(match_object.groups()[0])
 
         return u''
 
