@@ -1,7 +1,6 @@
 import re
 import Entities
 import Areas
-import types
 
 class PostAnalyzer:
     __post_analyzer = None
