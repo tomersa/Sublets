@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import re
 import Entities
 import Areas
@@ -13,7 +15,7 @@ class PostAnalyzer:
         return PostAnalyzer.__post_analyzer
 
     def __init__(self):
-        self.__extractor = [PostAnalyzer.get_area]
+        self.__extractor = [PostAnalyzer.get_street]
 
     def analyze_post(self, post):
         analysis = {}
@@ -25,6 +27,15 @@ class PostAnalyzer:
     @staticmethod
     def get_numbers(message):
         return re.findall("\\d+", message)
+
+    @staticmethod
+    def get_street(message):
+        match_object = re.search(u'רחוב (\W\W*?) ', message)
+        if not match_object is None:
+            a = match_object.groups(1)
+            return match_object.groups(1)
+
+        return u''
 
     @staticmethod
     def get_area(message):
