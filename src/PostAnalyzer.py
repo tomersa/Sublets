@@ -16,7 +16,7 @@ class PostAnalyzer:
         return PostAnalyzer.__post_analyzer
 
     def __init__(self):
-        self.__extractor = [PostAnalyzer.get_street]
+        self.__extractor = [self.get_street]
 
     def analyze_post(self, post):
         analysis = {}
@@ -25,20 +25,17 @@ class PostAnalyzer:
 
         return Entities.AnalyzedPost(post, analysis)
 
-    @staticmethod
-    def get_numbers(message):
+    def get_numbers(self, message):
         return re.findall("\\d+", message)
 
-    @staticmethod
-    def get_street(message):
+    def get_street(self, message):
         match_object = re.search(u'רחוב (\W\W*?) ', message)
         if not match_object is None:
             return match_object.groups(1)
 
         return u''
 
-    @staticmethod
-    def get_area(message):
+    def get_area(self, message):
         for area in Areas.Areas.get_areas():
             words = Areas.Areas.get_area_words(area)
 
