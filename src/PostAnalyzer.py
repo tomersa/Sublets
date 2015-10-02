@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import codecs
 import re
 import Entities
 import Areas
@@ -32,7 +33,6 @@ class PostAnalyzer:
     def get_street(message):
         match_object = re.search(u'רחוב (\W\W*?) ', message)
         if not match_object is None:
-            a = match_object.groups(1)
             return match_object.groups(1)
 
         return u''
