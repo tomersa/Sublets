@@ -11,7 +11,8 @@ class Sublets:
         self.__dr = DataReceiver(group_feed_directory)
         self.__anaylzed_posts = []
 
-        os.makedirs("output")
+        if not os.path.exists("output"):
+            os.makedirs("output")
 
     def main(self):
         for post in self.__dr.get_data():
