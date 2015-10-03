@@ -2,6 +2,7 @@ all: clean test
 
 clean:
 	rm -rf output/
+	rm -rf src/*.pyc
 
 install: install_dependencies
 
