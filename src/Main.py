@@ -14,12 +14,20 @@ class Sublets:
         if not os.path.exists("output"):
             os.makedirs("output")
 
+        if not os.path.exists("output/analyzed"):
+            os.makedirs("output/analyzed")
+
+
     def main(self):
         for post in self.__dr.get_data():
             with codecs.open(os.path.join("output", post.id), "w", encoding='utf-8') as out:
                 out.write(post.message)
 
             analyzed = PostAnalyzer.create().analyze_post(post)
+
+            with codecs.open(os.path.join("output/analyzed", post.id), "w", encoding='utf-8') as out:
+                out.write(unicode(analyzed))
+
             print analyzed
 
 if __name__ == "__main__":
