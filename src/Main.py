@@ -19,11 +19,10 @@ class Sublets:
             os.makedirs("output/analyzed")
 
     def main(self):
-
         recieved_data = self.__dr.get_data()
 
         if DEBUG:
-            recieved_data = recieved_data
+            recieved_data = recieved_data[:1000]
 
         for post in recieved_data:
             with codecs.open(os.path.join("output", post.id), "w", encoding='utf-8') as out:
