@@ -12,3 +12,6 @@ class AnalyzedPost:
 
     def __str__(self):
         return str(self.__analysis)
+
+    def get_analysis(self):
+        return dict(self.__analysis)
