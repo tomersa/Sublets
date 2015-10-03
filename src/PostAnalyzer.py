@@ -33,12 +33,13 @@ class PostAnalyzer:
         prices = re.findall(u'(\d+(?:,\d+)*) ש"ח', message)
 
         if len(prices) > 0:
-            return prices[0]
+            return int(prices[0].replace(u',', u''))
 
         # 2000 לחודש
         prices = re.findall(u"(\d+(?:,\d+)*) לחודש", message)
         if len(prices) > 0:
-            return prices[0]
+
+            return int(prices[0].replace(u',', u''))
 
     #Assuming line starts with the street name
     def __get_valid_street_name(self, line):

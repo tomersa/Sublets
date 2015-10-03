@@ -12,19 +12,21 @@ class PostAnalyzerTest(unittest.TestCase):
     def get_received_data():
         return DataReceiver("res/sublet_in_telaviv_for_short_periods").get_data()
 
-    def test_4_000(self):
-        price = u'4,000'
+    #Testing case: 3,200 ש"ח
+    def test_price_1(self):
+        price = 4000
         received_data = PostAnalyzerTest.get_received_data()
         analyzed = PostAnalyzer.create().analyze_post(received_data[60]).get_analysis().values()[0]
         self.assertEqual(analyzed, price, "Couldn't match price {0} (got: {1})".format(price, analyzed))
 
-        price = u'2500'
-        # received_data = PostAnalyzerTest.get_received_data()
+        price = 2500
         analyzed = PostAnalyzer.create().analyze_post(received_data[61]).get_analysis().values()[0]
         self.assertEqual(analyzed, price, "Couldn't match price {0} (got: {1})".format(price, analyzed))
 
-        price = u'5700'
-        # received_data = PostAnalyzerTest.get_received_data()
+    #Testing case: 2000 לחודש
+    def test_price_2(self):
+        price = 5700
+        received_data = PostAnalyzerTest.get_received_data()
         analyzed = PostAnalyzer.create().analyze_post(received_data[3]).get_analysis().values()[0]
         self.assertEqual(analyzed, price, "Couldn't match price {0} (got: {1})".format(price, analyzed))
 
