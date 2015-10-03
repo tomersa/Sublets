@@ -23,7 +23,7 @@ class PostAnalyzer:
         return PostAnalyzer.__post_analyzer
 
     def __init__(self):
-        self.__extractor = [self.get_price]
+        self.__extractor = [self.get_price, self.get_area, self.get_street]
 
         with codecs.open("res/tel_aviv_streets", "r", encoding='utf-8') as f:
             self.__streets = f.read().splitlines()
@@ -31,7 +31,7 @@ class PostAnalyzer:
     def analyze_post(self, post):
         analysis = {}
         for extractor in self.__extractor:
-            analysis[extractor] = extractor(post.message)
+            analysis[extractor.__name__] = extractor(post.message)
 
         return Entities.AnalyzedPost(post, analysis)
 
@@ -40,6 +40,8 @@ class PostAnalyzer:
 
         if len(phones) > 0:
             return phones[0]
+
+        return None
 
     def get_price(self, message):
         for regex in PostAnalyzer.__PRICE_REGEXES:
@@ -52,6 +54,8 @@ class PostAnalyzer:
 
         if len(prices) > 0:
             return int(prices[0].replace(u',', u'')) * PostAnalyzer.__DAYS_IN_TYPICAL_MONTH
+
+        return None
 
     #Assuming line starts with the street name
     def __get_valid_street_name(self, line):
@@ -74,7 +78,7 @@ class PostAnalyzer:
         if not match_object is None:
             return self.__get_valid_street_name(match_object.groups()[0])
 
-        return u''
+        return None
 
     def get_area(self, message):
         for area in Areas.Areas.get_areas():
@@ -87,4 +91,4 @@ class PostAnalyzer:
                 if word in message:
                     return area
 
-        return u'' #No area
+        return None #No area
