@@ -4,6 +4,9 @@ class Post:
         self.message = json_post[u'message']
         self.updated_time = json_post[u'updated_time']
 
+    def get_message(self):
+        return self.message
+
 
 class AnalyzedPost:
     def __init__(self, post, analysis):
@@ -15,3 +18,6 @@ class AnalyzedPost:
 
     def get_analysis(self):
         return dict(self.__analysis)
+
+    def get_post(self):
+        return self.__post
