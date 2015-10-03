@@ -32,15 +32,21 @@ class PostAnalyzer:
 
     def get_price(self, message):
         # 3,200 ש"ח
-        prices = re.findall(u'(\d+(?:,\d+)*) ש"ח', message)
+        prices = re.findall(u'(\d+(?:,\d+)*)(?: *ש"ח)', message)
 
         if len(prices) > 0:
             return int(prices[0].replace(u',', u''))
 
+        # 3,200 ₪
+        prices = re.findall(u'(\d+(?:,\d+)*)(?: *₪)', message)
+
+        if len(prices) > 0:
+            return int(prices[0].replace(u',', u''))
+
+
         # 2000 לחודש
         prices = re.findall(u"(\d+(?:,\d+)*) לחודש", message)
         if len(prices) > 0:
-
             return int(prices[0].replace(u',', u''))
 
         #150 ללילה,
