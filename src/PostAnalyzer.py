@@ -16,7 +16,7 @@ class PostAnalyzer:
         return PostAnalyzer.__post_analyzer
 
     def __init__(self):
-        self.__extractor = [self.get_street]
+        self.__extractor = [self.get_price]
 
         with codecs.open("res/tel_aviv_streets", "r", encoding='utf-8') as f:
             self.__streets = f.read().splitlines()
@@ -28,8 +28,17 @@ class PostAnalyzer:
 
         return Entities.AnalyzedPost(post, analysis)
 
-    def get_numbers(self, message):
-        return re.findall("\\d+", message)
+    def get_price(self, message):
+        # 3,200 ש"ח
+        prices = re.findall(u'(\d+(?:,\d+)*) ש"ח', message)
+
+        if len(prices) > 0:
+            return prices[0]
+
+        # 2000 לחודש
+        prices = re.findall(u"(\d+(?:,\d+)*) לחודש", message)
+        if len(prices) > 0:
+            return prices[0]
 
     #Assuming line starts with the street name
     def __get_valid_street_name(self, line):
