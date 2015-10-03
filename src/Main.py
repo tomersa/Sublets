@@ -5,6 +5,7 @@ import codecs
 from DataReceiver import DataReceiver
 from PostAnalyzer import PostAnalyzer
 
+DEBUG = True
 
 class Sublets:
     def __init__(self, group_feed_directory):
@@ -17,9 +18,14 @@ class Sublets:
         if not os.path.exists("output/analyzed"):
             os.makedirs("output/analyzed")
 
-
     def main(self):
-        for post in self.__dr.get_data():
+
+        recieved_data = self.__dr.get_data()
+
+        if DEBUG:
+            recieved_data = recieved_data
+
+        for post in recieved_data:
             with codecs.open(os.path.join("output", post.id), "w", encoding='utf-8') as out:
                 out.write(post.message)
 
