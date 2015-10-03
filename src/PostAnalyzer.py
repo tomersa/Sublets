@@ -43,6 +43,11 @@ class PostAnalyzer:
         if len(prices) > 0:
             return int(prices[0].replace(u',', u''))
 
+        #2000 שקלים
+        prices = re.findall(u'(\d+(?:,\d+)*)(?: *שקל)', message)
+
+        if len(prices) > 0:
+            return int(prices[0].replace(u',', u''))
 
         # 2000 לחודש
         prices = re.findall(u"(\d+(?:,\d+)*) לחודש", message)

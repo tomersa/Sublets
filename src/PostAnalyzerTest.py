@@ -44,6 +44,21 @@ class PostAnalyzerTest(unittest.TestCase):
         analyzed = PostAnalyzer.create().analyze_post(received_data[11]).get_analysis().values()[0]
         self.assertEqual(analyzed, price, "Couldn't match price {0} (got: {1})".format(price, analyzed))
 
+    # 2000 שקלים
+    def test_price_5(self):
+        price = 445
+        received_data = PostAnalyzerTest.get_received_data()
+        analyzed = PostAnalyzer.create().analyze_post(received_data[365]).get_analysis().values()[0]
+        self.assertEqual(analyzed, price, "Couldn't match price {0} (got: {1})".format(price, analyzed))
+
+    def test_price_all_prices_no_exception(self):
+        price = 1500
+        received_data = PostAnalyzerTest.get_received_data()
+
+        for i,j in enumerate(received_data):
+            analyzed = PostAnalyzer.create().analyze_post(j).get_analysis().values()[0]
+            print "{0}:\t{1}".format(i, analyzed)
+
 if __name__ == '__main__':
     unittest.main()
 
