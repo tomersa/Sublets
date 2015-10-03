@@ -35,6 +35,12 @@ class PostAnalyzer:
 
         return Entities.AnalyzedPost(post, analysis)
 
+    def get_phone(self, message):
+        phones = re.findall(u'\d{3}\-\d{7}', message)
+
+        if len(phones) > 0:
+            return phones[0]
+
     def get_price(self, message):
         for regex in PostAnalyzer.__PRICE_REGEXES:
             prices = re.findall(regex, message)
