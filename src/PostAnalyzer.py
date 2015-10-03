@@ -37,6 +37,12 @@ class PostAnalyzer:
         if len(prices) > 0:
             return int(prices[0].replace(u',', u''))
 
+        # 3,200 ש"ח
+        prices = re.findall(u'(\d+(?:,\d+)*)(?: *ש\u05f4ח)', message)
+
+        if len(prices) > 0:
+            return int(prices[0].replace(u',', u''))
+
         # 3,200 ₪
         prices = re.findall(u'(\d+(?:,\d+)*)(?: *₪)', message)
 
@@ -51,6 +57,16 @@ class PostAnalyzer:
 
         # 2000 לחודש
         prices = re.findall(u"(\d+(?:,\d+)*) לחודש", message)
+        if len(prices) > 0:
+            return int(prices[0].replace(u',', u''))
+
+        # משכירים ב-3800
+        prices = re.findall(u"משכירים ב\-{0,1}(\d+(?:,\d+)*)", message)
+        if len(prices) > 0:
+            return int(prices[0].replace(u',', u''))
+
+        # להשכרה ב-<>
+        prices = re.findall(u"להשכרה ב\-{0,1}(\d+(?:,\d+)*)", message)
         if len(prices) > 0:
             return int(prices[0].replace(u',', u''))
 
