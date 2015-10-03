@@ -8,6 +8,8 @@ import Areas
 class PostAnalyzer:
     __post_analyzer = None
 
+    __DAYS_IN_TYPICAL_MONTH = 30
+
     @staticmethod
     def create():
         if PostAnalyzer.__post_analyzer is None:
@@ -40,6 +42,11 @@ class PostAnalyzer:
         if len(prices) > 0:
 
             return int(prices[0].replace(u',', u''))
+
+        #150 ללילה,
+        prices = re.findall(u"(\d+(?:,\d+)*) ללילה", message)
+        if len(prices) > 0:
+            return int(prices[0].replace(u',', u'')) * PostAnalyzer.__DAYS_IN_TYPICAL_MONTH
 
     #Assuming line starts with the street name
     def __get_valid_street_name(self, line):
