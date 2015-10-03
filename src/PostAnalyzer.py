@@ -10,6 +10,9 @@ class PostAnalyzer:
 
     __DAYS_IN_TYPICAL_MONTH = 30
 
+    __PRICE_REGEXES = (u'(\d+(?:,\d+)*)(?: *ש"ח)', u'(\d+(?:,\d+)*)(?: *ש\u05f4ח)', u'(\d+(?:,\d+)*)(?: *₪)', u'(\d+(?:,\d+)*)(?: *שקל)', u"(\d+(?:,\d+)*) לחודש",\
+                       u"משכירים ב\-{0,1}(\d+(?:,\d+)*)", u"להשכרה ב\-{0,1}(\d+(?:,\d+)*)")
+
     @staticmethod
     def create():
         if PostAnalyzer.__post_analyzer is None:
@@ -31,47 +34,14 @@ class PostAnalyzer:
         return Entities.AnalyzedPost(post, analysis)
 
     def get_price(self, message):
-        # 3,200 ש"ח
-        prices = re.findall(u'(\d+(?:,\d+)*)(?: *ש"ח)', message)
+        for regex in PostAnalyzer.__PRICE_REGEXES:
+            prices = re.findall(regex, message)
 
-        if len(prices) > 0:
-            return int(prices[0].replace(u',', u''))
+            if len(prices) > 0:
+                return int(prices[0].replace(u',', u''))
 
-        # 3,200 ש"ח
-        prices = re.findall(u'(\d+(?:,\d+)*)(?: *ש\u05f4ח)', message)
-
-        if len(prices) > 0:
-            return int(prices[0].replace(u',', u''))
-
-        # 3,200 ₪
-        prices = re.findall(u'(\d+(?:,\d+)*)(?: *₪)', message)
-
-        if len(prices) > 0:
-            return int(prices[0].replace(u',', u''))
-
-        #2000 שקלים
-        prices = re.findall(u'(\d+(?:,\d+)*)(?: *שקל)', message)
-
-        if len(prices) > 0:
-            return int(prices[0].replace(u',', u''))
-
-        # 2000 לחודש
-        prices = re.findall(u"(\d+(?:,\d+)*) לחודש", message)
-        if len(prices) > 0:
-            return int(prices[0].replace(u',', u''))
-
-        # משכירים ב-3800
-        prices = re.findall(u"משכירים ב\-{0,1}(\d+(?:,\d+)*)", message)
-        if len(prices) > 0:
-            return int(prices[0].replace(u',', u''))
-
-        # להשכרה ב-<>
-        prices = re.findall(u"להשכרה ב\-{0,1}(\d+(?:,\d+)*)", message)
-        if len(prices) > 0:
-            return int(prices[0].replace(u',', u''))
-
-        #150 ללילה,
         prices = re.findall(u"(\d+(?:,\d+)*) ללילה", message)
+
         if len(prices) > 0:
             return int(prices[0].replace(u',', u'')) * PostAnalyzer.__DAYS_IN_TYPICAL_MONTH
 
