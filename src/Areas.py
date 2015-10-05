@@ -14,9 +14,11 @@ class Areas:
     TAU = "TAU"
     YAFO = "YAFO"
     GAN_MEIR = "GAN_MEIR"
+    BAVLI = "BAVLI"
 
     __AREAS = {OLD_NORTH: (u'צפון ישן', u'צפון הישן'),
                BASEL: (u'בזל'),
+               BAVLI: (u'בבלי'),
                SHAPIRA: (u'שפירא'),
                FLORENTIN: (u'פלורנטין'),
                TEL_AVIV_CENTER: (u'מרכז תל אביב'),
