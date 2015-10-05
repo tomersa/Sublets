@@ -4,6 +4,7 @@ import codecs
 import re
 import Entities
 import Areas
+import calendar
 
 class PostAnalyzer:
     __post_analyzer = None
@@ -23,10 +24,13 @@ class PostAnalyzer:
         return PostAnalyzer.__post_analyzer
 
     def __init__(self):
-        self.__extractor = [self.get_price, self.get_area, self.get_street]
+        self.__extractor = [self.get_price_period]
 
         with codecs.open("res/tel_aviv_streets", "r", encoding='utf-8') as f:
             self.__streets = f.read().splitlines()
+
+        self.__months = [month for month in calendar.month_name]
+        self.__months.extend((u'ינואר', u'פברואר', u'מרץ', u'אפריל', u'מאי', u'יוני', u'יולי', u'אוגוסט', u'ספטמבר', u'אוקטובר', u'נובמבר', u'דצמבר'))
 
     def analyze_post(self, post):
         analysis = {}
@@ -55,6 +59,45 @@ class PostAnalyzer:
         if len(prices) > 0:
             return int(prices[0].replace(u',', u'')) * PostAnalyzer.__DAYS_IN_TYPICAL_MONTH
 
+        return None
+
+    def get_price_period(self, message):
+        period = re.findall(u'[pP]er [Nn]ight|PER NIGHT|\d+ {0,1}[\\u05f4₪]{0,1}\/ night|ללילה', message)
+
+        if len(period) > 0:
+            return "PER_NIGHT"
+
+        period = re.findall(u'[pP]er [Mm]onth|PER MONTH\d+ {0,1}[\\u05f4₪]{0,1}\/ month|לחודש', message)
+
+        if len(period) > 0:
+            return "PER_MONTH"
+
+        period = re.findall(u'[Ee]ntire [Pp]eriod|לכל התקופה', message)
+
+        if len(period) > 0:
+            return "PER_ENTIRE_PERIOD"
+
+        #Trying getting numerical date.
+        for reg in (u'\d+\/\d+\-\d+\/\d+|\d+\.\d+\-\d+\.\d+', u''):
+            period = re.findall(reg, message)
+
+            if not len(period) is 1:
+                continue
+
+            period = set(re.findall(u'\d+/\d+|\d+\.\d+', period[0]))
+
+        if len(period) is 2:
+            return period
+
+        #Trying to get written date
+        month_indices = [(re.search(unicode(month), message).start(), month) for month in self.__months if not re.search(unicode(month), message) is None]
+        min_index, min_month = month_indices[0]
+        for index, month in month_indices:
+            if index < min_index:
+                min_index = index
+                min_month = month
+
+        #TODO: Continue finding the other month by name, convert to numerical and return.
         return None
 
     #Assuming line starts with the street name
