@@ -6,15 +6,22 @@ import Entities
 import Areas
 import calendar
 
+
 class PostAnalyzer:
     __post_analyzer = None
 
     __DAYS_IN_TYPICAL_MONTH = 30
 
-    __PRICE_REGEXES = (u'(\d+(?:,\d+)*)(?: *ש"ח)', u'(\d+(?:,\d+)*)(?: *ש\u05f4{0,1}ח)',u'(\d+(?:,\d+)*)(?: *כולל)', u'(\d+(?:,\d+)*)(?: *₪)', u'(\d+(?:,\d+)*)(?: *שקל)', u"(\d+(?:,\d+)*) לחודש",\
-                       u"משכירים ב\-{0,1}(\d+(?:,\d+)*)", u'(\d+(?:,\d+)*)(?: *לכל התקופה)', u"המחיר:{0,1} (\d+(?:,\d+)*)", u"המחיר לכל התקופה הוא (\d+(?:,\d+)*)", u"שכר דירה (\d+(?:,\d+)*)", u"שכ\"{0,1}ד (\d+(?:,\d+)*)", u"שכ\u05f4{0,1}ד (\d+(?:,\d+)*)",\
-                       u"להשכרה ב\-{0,1}(\d+(?:,\d+)*)", u"whole period is (\d+(?:,\d+)*)", u"(\d+(?:,\d+)*) EUR per", u"(\d+(?:,\d+)*) [Ss]hekel", u'(\d+(?:,\d+)*)(?: *לחודש)', u'(\d+(?:,\d+)*)(?: *NIS)',\
-                       u'(\d+(?:,\d+)*)(?: *Nis)', u'ONLY (\d+(?:,\d+)*)', u'only (\d+(?:,\d+)*)', u'(\d+(?:,\d+)*)(?: *ils)', u'(\d+(?:,\d+)*)(?: *לא כולל)', u'(\d+(?:,\d+)*)(?: *INS)', u'\n(\d+(?:,\d+)*)\n')
+    __PRICE_REGEXES = (u'(\d+(?:,\d+)*)(?: *ש"ח)', u'(\d+(?:,\d+)*)(?: *ש\u05f4{0,1}ח)', u'(\d+(?:,\d+)*)(?: *כולל)',
+                       u'(\d+(?:,\d+)*)(?: *₪)', u'(\d+(?:,\d+)*)(?: *שקל)', u"(\d+(?:,\d+)*) לחודש", \
+                       u"משכירים ב\-{0,1}(\d+(?:,\d+)*)", u'(\d+(?:,\d+)*)(?: *לכל התקופה)',
+                       u"המחיר:{0,1} (\d+(?:,\d+)*)", u"המחיר לכל התקופה הוא (\d+(?:,\d+)*)",
+                       u"שכר דירה (\d+(?:,\d+)*)", u"שכ\"{0,1}ד (\d+(?:,\d+)*)", u"שכ\u05f4{0,1}ד (\d+(?:,\d+)*)", \
+                       u"להשכרה ב\-{0,1}(\d+(?:,\d+)*)", u"whole period is (\d+(?:,\d+)*)", u"(\d+(?:,\d+)*) EUR per",
+                       u"(\d+(?:,\d+)*) [Ss]hekel", u'(\d+(?:,\d+)*)(?: *לחודש)', u'(\d+(?:,\d+)*)(?: *NIS)', \
+                       u'(\d+(?:,\d+)*)(?: *Nis)', u'ONLY (\d+(?:,\d+)*)', u'only (\d+(?:,\d+)*)',
+                       u'(\d+(?:,\d+)*)(?: *ils)', u'(\d+(?:,\d+)*)(?: *לא כולל)', u'(\d+(?:,\d+)*)(?: *INS)',
+                       u'\n(\d+(?:,\d+)*)\n')
 
     EXTRACTORS = None
 
@@ -37,7 +44,10 @@ class PostAnalyzer:
             self.__streets = f.read().splitlines()
 
         self.__months = [month for month in calendar.month_name]
-        self.__months.extend((u'ינואר', u'פברואר', u'מרץ', u'אפריל', u'מאי', u'יוני', u'יולי', u'אוגוסט', u'ספטמבר', u'אוקטובר', u'נובמבר', u'דצמבר'))
+        self.__months.extend((
+            u'ינואר', u'פברואר', u'מרץ', u'אפריל', u'מאי', u'יוני', u'יולי', u'אוגוסט', u'ספטמבר', u'אוקטובר',
+            u'נובמבר',
+            u'דצמבר'))
 
     def set_extractors(self, *methods):
         self.__extractor = [PostAnalyzer.EXTRACTORS[method] for method in methods]
@@ -87,7 +97,7 @@ class PostAnalyzer:
         if len(period) > 0:
             return "PER_ENTIRE_PERIOD"
 
-        #Trying getting numerical date.
+        # Trying getting numerical date.
         for reg in (u'\d+\/\d+\-\d+\/\d+|\d+\.\d+\-\d+\.\d+', u''):
             period = re.findall(reg, message)
 
@@ -99,8 +109,9 @@ class PostAnalyzer:
         if len(period) is 2:
             return period
 
-        #Trying to get written date
-        month_indices = [(re.search(unicode(month), message).start(), month) for month in self.__months if not re.search(unicode(month), message) is None]
+        # Trying to get written date
+        month_indices = [(re.search(unicode(month), message).start(), month) for month in self.__months if
+                         not re.search(unicode(month), message) is None]
         min_index, min_month = month_indices[0]
         for index, month in month_indices:
             if index < min_index:
@@ -110,7 +121,7 @@ class PostAnalyzer:
         #TODO: Continue finding the other month by name, convert to numerical and return.
         return None
 
-    #Assuming line starts with the street name
+    # Assuming line starts with the street name
     def __get_valid_street_name(self, line):
         possible_streets = filter(line.startswith, self.__streets)
 
@@ -124,7 +135,6 @@ class PostAnalyzer:
                 return street
 
         raise StandardError("Couldn't find longest street(That's logically impossible).")
-
 
     def get_street(self, message):
         match_object = re.search(u'רחוב (\W\W*?) ', message)
@@ -144,4 +154,4 @@ class PostAnalyzer:
                 if word in message:
                     return area
 
-        return None #No area
+        return None  # No area
