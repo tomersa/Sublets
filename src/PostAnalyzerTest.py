@@ -74,7 +74,6 @@ class PostAnalyzerTest(unittest.TestCase):
 
         for i,j in enumerate(received_data):
             analyzed = PostAnalyzer.create().analyze_post(j).get_analysis().values()[0]
-            print "{0}:\t{1}".format(i, analyzed)
 
 if __name__ == '__main__':
     unittest.main()
