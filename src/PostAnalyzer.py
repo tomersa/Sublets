@@ -38,7 +38,7 @@ class PostAnalyzer:
                                    "GET_AREA": self.get_area}
 
         self.__extractor = []
-        self.set_extractors("GET_PRICE_PERIOD")
+        self.set_extractors("GET_PRICE")
 
         with codecs.open("res/tel_aviv_streets", "r", encoding='utf-8') as f:
             self.__streets = f.read().splitlines()
@@ -97,34 +97,10 @@ class PostAnalyzer:
         if len(period) > 0:
             return "PER_ENTIRE_PERIOD"
 
-        # Trying getting numerical date.
-        for reg in (u'\d+\/\d+\-\d+\/\d+|\d+\.\d+\-\d+\.\d+', u''):
-            period = re.findall(reg, message)
+        numerical_data = self.__get_numerical_price_period(message)
 
-            if not len(period) is 1:
-                continue
-
-            period = list(set(re.findall(u'\d+/\d+|\d+\.\d+', period[0]))) #Removing duplicates
-
-            if len(period) is 2:
-                for reg in (u'(?P<day>\d+)\/(?P<month>\d+)', u'(?P<day>\d+)\.(?P<month>\d+)'):
-                    match = re.search(reg, period[0])
-                    first_day = match.groups('day')
-                    first_month = match.groups('month')
-
-                    if not first_day is None and not first_month is None:
-                        break
-
-                for reg in (u'(?P<day>\d+)\/(?P<month>\d+)', u'(?P<day>\d+)\.(?P<month>\d+)'):
-                    match = re.search(u'(?P<day>\d+)\/(?P<month>\d+)|(?P<day>\d+)\.(?P<month>\d+)', period[1])
-                    second_day = match.groups('day')
-                    second_month = match.groups('month')
-
-                    if not first_day is None and not first_month is None:
-                        break
-
-                self.__get_period_in_days(first_day, first_month, second_day, second_month)
-                return period
+        if not numerical_data is None:
+            return numerical_data
 
         # Trying to get written date
         month_indices = [(re.search(unicode(month), message).start(), month) for month in self.__months if
@@ -173,6 +149,61 @@ class PostAnalyzer:
 
         return None  # No area
 
-    def __get_period_in_days(self, first_day, first_month, second_day, second_month):
-        delta = datetime.datetime(day=first_day, month=first_month) - datetime.datetime(day=second_day, month=second_month)
-        return delta.days
+    def __get_period_in_days(self, first_day, second_day, first_month, second_month, first_year, second_year):
+        try:
+            delta = datetime.datetime(year=second_year, day=second_day, month=second_month) -\
+                    datetime.datetime(year=first_year, day=first_day, month=first_month)
+
+
+        except ValueError, e:
+            print e
+            return None
+
+        return abs(delta.days) #Sometimes dates are given backwards in that case we got negative result so we take the absolute value.
+
+    def __get_numerical_price_period(self, message):
+        groups_dict = None
+        found = False
+        for reg in (u'(?P<f_day>\d+)\/(?P<f_month>\d+)\/(?P<f_year>\d+) {0,1}\- {0,1}(?P<s_day>\d+)\/(?P<s_month>\d+)\/(?P<s_year>\d+)',
+                    u'(?P<f_day>\d+)\.(?P<f_month>\d+)\.(?P<f_year>\d+) {0,1}\- {0,1}(?P<s_day>\d+)\.(?P<s_month>\d+)\.(?P<s_year>\d+)',
+                    u'(?P<f_day>\d+)\/(?P<f_month>\d+) {0,1}\- {0,1}(?P<s_day>\d+)\/(?P<s_month>\d+)',
+                    u'(?P<f_day>\d+)\.(?P<f_month>\d+) {0,1}\- {0,1}(?P<s_day>\d+)\.(?P<s_month>\d+)'):
+            dates = re.search(reg, message)
+
+            if not dates is None:
+                found_all_names = True
+                groups_dict = dates.groupdict()
+
+                for name in (u'f_day', u'f_month', u's_day', u's_month'):
+                    if not groups_dict.has_key(name):
+                        found_all_names = False
+
+                if found_all_names:
+                    for year_key in (u'f_year', u's_year'):
+                        if not groups_dict.has_key(year_key):
+                            groups_dict[year_key] = datetime.datetime.now().year
+
+                    found = True
+                    break #Breaking from regexp loop because dates were found.
+
+        if not found:
+            return None
+
+        return self.__get_period_in_days(int(groups_dict['f_day']), int(groups_dict['s_day']),
+                                         int(groups_dict['f_month']), int(groups_dict['s_month']),
+                                         int(groups_dict['f_year']), int(groups_dict['s_year']))
+
+    def __get_day_and_month(self, date):
+        for reg in (u'(?P<day>\d+)\/(?P<month>\d+)', u'(?P<day>\d+)\.(?P<month>\d+)'):
+            match = re.search(reg, date)
+
+            if match is None:
+                continue
+
+            day = int(match.group('day'))
+            month = int(match.group('month'))
+
+            if not day is None and not month is None:
+                return day, month
+
+        return None
