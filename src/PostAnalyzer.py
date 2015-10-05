@@ -16,6 +16,8 @@ class PostAnalyzer:
                        u"להשכרה ב\-{0,1}(\d+(?:,\d+)*)", u"whole period is (\d+(?:,\d+)*)", u"(\d+(?:,\d+)*) EUR per", u"(\d+(?:,\d+)*) [Ss]hekel", u'(\d+(?:,\d+)*)(?: *לחודש)', u'(\d+(?:,\d+)*)(?: *NIS)',\
                        u'(\d+(?:,\d+)*)(?: *Nis)', u'ONLY (\d+(?:,\d+)*)', u'only (\d+(?:,\d+)*)', u'(\d+(?:,\d+)*)(?: *ils)', u'(\d+(?:,\d+)*)(?: *לא כולל)', u'(\d+(?:,\d+)*)(?: *INS)', u'\n(\d+(?:,\d+)*)\n')
 
+    EXTRACTORS = None
+
     @staticmethod
     def create():
         if PostAnalyzer.__post_analyzer is None:
@@ -24,13 +26,21 @@ class PostAnalyzer:
         return PostAnalyzer.__post_analyzer
 
     def __init__(self):
-        self.__extractor = [self.get_price_period]
+        PostAnalyzer.EXTRACTORS = {"GET_PHONE": self.get_phone, "GET_PRICE": self.get_price,
+                                   "GET_PRICE_PERIOD": self.get_price_period, "GET_STREET": self.get_street,
+                                   "GET_AREA": self.get_area}
+
+        self.__extractor = []
+        self.set_extractors("GET_PRICE_PERIOD")
 
         with codecs.open("res/tel_aviv_streets", "r", encoding='utf-8') as f:
             self.__streets = f.read().splitlines()
 
         self.__months = [month for month in calendar.month_name]
         self.__months.extend((u'ינואר', u'פברואר', u'מרץ', u'אפריל', u'מאי', u'יוני', u'יולי', u'אוגוסט', u'ספטמבר', u'אוקטובר', u'נובמבר', u'דצמבר'))
+
+    def set_extractors(self, *methods):
+        self.__extractor = [PostAnalyzer.EXTRACTORS[method] for method in methods]
 
     def analyze_post(self, post):
         analysis = {}
