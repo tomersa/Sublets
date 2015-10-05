@@ -130,9 +130,28 @@ class PostAnalyzer:
         raise StandardError("Couldn't find longest street(That's logically impossible).")
 
     def get_street(self, message):
-        match_object = re.search(u'רחוב (\W\W*?) ', message)
-        if not match_object is None:
-            return self.__get_valid_street_name(match_object.groups()[0])
+        STREET_CORNER_REGEXP = (u'רחוב (?P<street>\W\W*?) פינת (?P<corner>\W\W*?)[\., \)\($]',\
+                                u'רחוב (?P<street>\W\W*?) על (?P<corner>\W\W*?)[\., \)\($]',\
+                                u'בפינת (?P<street>\W\W*?) (?:ו-|ו){0,1}(?P<corner>\W\W*?)[\., \)\($]')
+
+        for reg in STREET_CORNER_REGEXP:
+            street_with_corner_match = re.search(reg, message)
+
+            if not street_with_corner_match is None:
+                street = self.__get_valid_street_name(street_with_corner_match.group('street'))
+                corner = self.__get_valid_street_name(street_with_corner_match.group('corner'))
+
+                if not street is None and not corner is None:
+                    return street, corner
+
+        STREET_REGEXP = (u'רחוב (\W\W*?) ',
+                         u'[Ll]ocated in (\W\W*?) ')
+
+        for street in STREET_REGEXP:
+            street_match = re.search(street, message)
+
+            if not street_match is None:
+                return self.__get_valid_street_name(street_match.groups()[0])
 
         return None
 
