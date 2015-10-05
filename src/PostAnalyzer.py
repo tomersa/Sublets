@@ -2,10 +2,10 @@
 
 import codecs
 import re
+import datetime
 import Entities
 import Areas
 import calendar
-
 
 class PostAnalyzer:
     __post_analyzer = None
@@ -104,10 +104,27 @@ class PostAnalyzer:
             if not len(period) is 1:
                 continue
 
-            period = set(re.findall(u'\d+/\d+|\d+\.\d+', period[0]))
+            period = list(set(re.findall(u'\d+/\d+|\d+\.\d+', period[0]))) #Removing duplicates
 
-        if len(period) is 2:
-            return period
+            if len(period) is 2:
+                for reg in (u'(?P<day>\d+)\/(?P<month>\d+)', u'(?P<day>\d+)\.(?P<month>\d+)'):
+                    match = re.search(reg, period[0])
+                    first_day = match.groups('day')
+                    first_month = match.groups('month')
+
+                    if not first_day is None and not first_month is None:
+                        break
+
+                for reg in (u'(?P<day>\d+)\/(?P<month>\d+)', u'(?P<day>\d+)\.(?P<month>\d+)'):
+                    match = re.search(u'(?P<day>\d+)\/(?P<month>\d+)|(?P<day>\d+)\.(?P<month>\d+)', period[1])
+                    second_day = match.groups('day')
+                    second_month = match.groups('month')
+
+                    if not first_day is None and not first_month is None:
+                        break
+
+                self.__get_period_in_days(first_day, first_month, second_day, second_month)
+                return period
 
         # Trying to get written date
         month_indices = [(re.search(unicode(month), message).start(), month) for month in self.__months if
@@ -155,3 +172,7 @@ class PostAnalyzer:
                     return area
 
         return None  # No area
+
+    def __get_period_in_days(self, first_day, first_month, second_day, second_month):
+        delta = datetime.datetime(day=first_day, month=first_month) - datetime.datetime(day=second_day, month=second_month)
+        return delta.days
