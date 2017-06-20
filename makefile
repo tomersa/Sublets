@@ -14,3 +14,6 @@ example:
  
 test:
 	python src/PostAnalyzerTest.py
+
+calc_results:
+	./calc_results.sh
