@@ -1,4 +1,4 @@
-all: clean test
+all: clean example 
 
 clean:
 	rm -rf output/
@@ -11,6 +11,7 @@ install_dependencies:
 
 example: 
 	python src/Main.py res/sublet_in_telaviv_for_short_periods
+	./calc_results.sh
  
 test:
 	python src/PostAnalyzerTest.py
