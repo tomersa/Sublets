@@ -1,4 +1,3 @@
-import types
 import pprint
 import codecs
 import json
@@ -37,8 +36,8 @@ class DataReceiver:
         if os.path.exists(".debug"):
             file_list = file_list[:1]
 
-        for file in file_list:
-            group_feed_file = os.path.join(group_feed_directory, file)
+        for current_file in file_list:
+            group_feed_file = os.path.join(group_feed_directory, current_file)
 
             with codecs.open(group_feed_file, "r", encoding="utf-8") as gf_handle:
                 data = None
@@ -46,7 +45,7 @@ class DataReceiver:
                     data = json.load(gf_handle)
                 except StandardError, e:
                     self.__statistics[DataReceiver.ERROR_COULDNT_READ_JSON].append(
-                        DataReceiver.ERROR_COULDNT_READ_JSON.format(file))
+                        DataReceiver.ERROR_COULDNT_READ_JSON.format(current_file))
                     continue
 
                 self.__statistics[DataReceiver.JSONS_READ] += 1

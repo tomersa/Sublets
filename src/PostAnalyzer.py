@@ -159,7 +159,7 @@ class PostAnalyzer:
         for area in Areas.Areas.get_areas():
             words = Areas.Areas.get_area_words(area)
 
-            if not type(words) is type(()) and not type(words) is type([]):
+            if not isinstance(words) is isinstance(()) and not isinstance(words) is isinstance([]):
                 words = [words]
 
             for word in words:
