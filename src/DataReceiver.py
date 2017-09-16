@@ -43,7 +43,7 @@ class DataReceiver:
                 data = None
                 try:
                     data = json.load(gf_handle)
-                except StandardError, e:
+                except StandardError:
                     self.__statistics[DataReceiver.ERROR_COULDNT_READ_JSON].append(
                         DataReceiver.ERROR_COULDNT_READ_JSON.format(current_file))
                     continue

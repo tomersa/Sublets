@@ -69,7 +69,7 @@ class PostAnalyzerTest(unittest.TestCase):
         received_data = PostAnalyzerTest.get_received_data()
 
         for i in received_data:
-            analyzed = PostAnalyzer.create().analyze_post(i).get_analysis().values()[0]
+            PostAnalyzer.create().analyze_post(i).get_analysis().values()[0]
 
 if __name__ == '__main__':
     unittest.main()
