@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-import codecs
-import os
-
 import unittest
 from PostAnalyzer import PostAnalyzer
 from DataReceiver import DataReceiver
@@ -55,25 +52,24 @@ class PostAnalyzerTest(unittest.TestCase):
         self.assertEqual(analyzed, price, "Couldn't match price {0} (got: {1})".format(price, analyzed))
 
     # משכירים ב-
-    def test_price_5(self):
+    def test_price_6(self):
         price = 3800
         received_data = PostAnalyzerTest.get_received_data()
         analyzed = PostAnalyzer.create().analyze_post(received_data[0]).get_analysis().values()[0]
         self.assertEqual(analyzed, price, "Couldn't match price {0} (got: {1})".format(price, analyzed))
 
     # משכירים ב-
-    def test_price_5(self):
+    def test_price_7(self):
         price = 3500
         received_data = PostAnalyzerTest.get_received_data()
         analyzed = PostAnalyzer.create().analyze_post(received_data[1]).get_analysis().values()[0]
         self.assertEqual(analyzed, price, "Couldn't match price {0} (got: {1})".format(price, analyzed))
 
     def test_price_all_prices_no_exception(self):
-        price = 1500
         received_data = PostAnalyzerTest.get_received_data()
 
-        for i,j in enumerate(received_data):
-            analyzed = PostAnalyzer.create().analyze_post(j).get_analysis().values()[0]
+        for i in received_data:
+            analyzed = PostAnalyzer.create().analyze_post(i).get_analysis().values()[0]
 
 if __name__ == '__main__':
     unittest.main()
